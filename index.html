@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eurovision 2026 — Голосование Двух Жюри</title>
+    <style>
+        :root {
+            --bg-deep: #060618;
+            --bg-card: #0d0d2b;
+            --gold: #f4c542;
+            --gold-light: #ffe08a;
+            --accent: #c084fc;
+            --accent2: #22d3ee;
+            --text: #e2e0f0;
+            --text-dim: #9898b8;
+            --border: rgba(255, 255, 255, 0.08);
+            --slider-track: #1e1e45;
+            --danger: #ff6b7a;
+            --success: #4ade80;
+            --voter1-accent: #f472b6;
+            --voter2-accent: #60a5fa;
+            --glow-gold: 0 0 30px rgba(244, 197, 66, 0.25);
+            --glow-pink: 0 0 25px rgba(244, 114, 182, 0.2);
+            --glow-blue: 0 0 25px rgba(96, 165, 250, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--bg-deep);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.5;
+        }
+
+        /* === Starfield Background === */
+        .starfield {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .star {
+            position: absolute;
+            border-radius: 50%;
+            background: #fff;
+            animation: twinkle var(--dur) ease-in-out infinite;
+            animation-delay: var(--delay);
+            opacity: 0;
+        }
+        @keyframes twinkle {
+            0%,
+            100% {
+                opacity: 0.2;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.9;
+                transform: scale(1.6);
+            }
+        }
+
+        /* === Main Container === */
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 16px 20px 40px;
+        }
+
+        /* === Header === */
+        .header {
+            text-align: center;
+            padding: 30px 20px 20px;
+            position: relative;
+        }
+        .header-logo {
+            display: inline-block;
+            font-size: 3.5rem;
+            font-weight: 900;
+            letter-spacing: -0.02em;
+            background: linear-gradient(180deg, #ffe08a 0%, #f4c542 40%, #c8960c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0 0 20px rgba(244, 197, 66, 0.5));
+            margin-bottom: 4px;
+            line-height: 1.1;
+        }
+        .header-sub {
+            font-size: 1.05rem;
+            color: var(--text-dim);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+        }
+        .header-year {
+            display: inline-block;
+            background: var(--gold);
+            color: #0a0a1a;
+            font-weight: 800;
+            font-size: 1.3rem;
+            padding: 4px 18px;
+            border-radius: 50px;
+            margin: 10px 0 6px;
+            letter-spacing: 0.05em;
+            box-shadow: var(--glow-gold);
+        }
+        .heart-pulse {
+            display: inline-block;
+            animation: heartbeat 1.2s ease-in-out infinite;
+            font-size: 2rem;
+            vertical-align: middle;
+            margin: 0 6px;
+        }
+        @keyframes heartbeat {
+            0%,
+            100% {
+                transform: scale(1);
+            }
+            15% {
+                transform: scale(1.25);
+            }
+            30% {
+                transform: scale(1);
+            }
+            45% {
+                transform: scale(1.18);
+            }
+            60% {
+                transform: scale(1);
+            }
+        }
+
+        /* === Voting Layout === */
+        .voting-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-top: 20px;
+        }
+        @media (max-width: 1100px) {
+            .voting-grid {
+                grid-template-columns: 1fr;
+                gap: 18px;
+            }
+        }
+
+        /* === Voter Panel === */
+        .voter-panel {
+            background: var(--bg-card);
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            box-shadow: 0 8px 50px rgba(0, 0, 0, 0.4);
+            display: flex;
+            flex-direction: column;
+            max-height: 85vh;
+        }
+        .voter-panel.voter1 {
+            border-top: 3px solid var(--voter1-accent);
+            box-shadow: var(--glow-pink), 0 8px 50px rgba(0, 0, 0, 0.4);
+        }
+        .voter-panel.voter2 {
+            border-top: 3px solid var(--voter2-accent);
+            box-shadow: var(--glow-blue), 0 8px 50px rgba(0, 0, 0, 0.4);
+        }
+
+        .voter-header {
+            padding: 18px 22px 14px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 5;
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(10px);
+        }
+        .voter-header h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            margin: 0;
+        }
+        .voter1 .voter-header h2 {
+            color: var(--voter1-accent);
+        }
+        .voter2 .voter-header h2 {
+            color: var(--voter2-accent);
+        }
+        .voter-header .voter-icon {
+            font-size: 2.2rem;
+            display: block;
+            margin-bottom: 2px;
+        }
+        .voter-total {
+            font-size: 0.9rem;
+            color: var(--text-dim);
+            margin-top: 4px;
+            letter-spacing: 0.03em;
+        }
+        .voter-total strong {
+            color: var(--gold-light);
+            font-size: 1.2rem;
+        }
+
+        /* === Country Cards List === */
+        .country-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px 14px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            scroll-behavior: smooth;
+        }
+        .country-list::-webkit-scrollbar {
+            width: 5px;
+        }
+        .country-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .country-list::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.12);
+            border-radius: 10px;
+        }
+        .country-list::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        /* === Country Card === */
+        .country-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 14px;
+            padding: 14px 16px;
+            transition: all 0.3s ease;
+            position: relative;
+            cursor: default;
+        }
+        .country-card:hover {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(255, 255, 255, 0.14);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25);
+        }
+        .country-card.highlighted {
+            border-color: var(--gold);
+            box-shadow: 0 0 18px rgba(244, 197, 66, 0.15);
+            background: rgba(244, 197, 66, 0.04);
+        }
+        .card-top {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .card-flag {
+            font-size: 1.6rem;
+            flex-shrink: 0;
+            line-height: 1;
+        }
+        .card-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .card-country {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #fff;
+            letter-spacing: 0.02em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .card-artist-song {
+            font-size: 0.78rem;
+            color: var(--text-dim);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-style: italic;
+        }
+        .card-score-badge {
+            flex-shrink: 0;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            letter-spacing: 0.03em;
+            transition: all 0.3s ease;
+            min-width: 42px;
+            text-align: center;
+        }
+        .card-score-badge.active {
+            color: var(--gold-light);
+            background: rgba(244, 197, 66, 0.15);
+            box-shadow: 0 0 10px rgba(244, 197, 66, 0.2);
+        }
+
+        /* === Sliders === */
+        .sliders-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px 16px;
+        }
+        @media (max-width: 700px) {
+            .sliders-row {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+        }
+        .slider-group {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-dim);
+            font-weight: 600;
+        }
+        .slider-label .criteria-icon {
+            font-size: 0.85rem;
+        }
+        .slider-value {
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: #fff;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            padding: 1px 8px;
+            min-width: 26px;
+            text-align: center;
+            transition: all 0.25s ease;
+        }
+        .slider-value.high {
+            background: rgba(244, 197, 66, 0.25);
+            color: var(--gold-light);
+        }
+        .slider-value.mid {
+            background: rgba(192, 132, 252, 0.2);
+            color: #d4b8ff;
+        }
+        .slider-value.low {
+            background: rgba(255, 255, 255, 0.06);
+            color: #aaa;
+        }
+
+        /* Range Input Styling */
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 8px;
+            border-radius: 10px;
+            background: var(--slider-track);
+            outline: none;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: #fff;
+            border: 2px solid var(--gold);
+            cursor: pointer;
+            box-shadow: 0 0 14px rgba(244, 197, 66, 0.4);
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        input[type="range"]::-webkit-slider-thumb:hover {
+            box-shadow: 0 0 22px rgba(244, 197, 66, 0.7);
+            transform: scale(1.1);
+        }
+        input[type="range"]::-webkit-slider-thumb:active {
+            box-shadow: 0 0 28px rgba(244, 197, 66, 0.9);
+            transform: scale(1.15);
+            background: #fffbe6;
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: #fff;
+            border: 2px solid var(--gold);
+            cursor: pointer;
+            box-shadow: 0 0 14px rgba(244, 197, 66, 0.4);
+        }
+        .voter1 input[type="range"]::-webkit-slider-thumb {
+            border-color: var(--voter1-accent);
+            box-shadow: 0 0 14px rgba(244, 114, 182, 0.4);
+        }
+        .voter1 input[type="range"]::-webkit-slider-thumb:hover {
+            box-shadow: 0 0 22px rgba(244, 114, 182, 0.7);
+        }
+        .voter2 input[type="range"]::-webkit-slider-thumb {
+            border-color: var(--voter2-accent);
+            box-shadow: 0 0 14px rgba(96, 165, 250, 0.4);
+        }
+        .voter2 input[type="range"]::-webkit-slider-thumb:hover {
+            box-shadow: 0 0 22px rgba(96, 165, 250, 0.7);
+        }
+
+        /* === Buttons === */
+        .btn-row {
+            display: flex;
+            gap: 10px;
+            padding: 14px 16px;
+            border-top: 1px solid var(--border);
+            flex-wrap: wrap;
+            justify-content: center;
+            background: var(--bg-card);
+            position: sticky;
+            bottom: 0;
+            z-index: 5;
+        }
+        .btn {
+            padding: 11px 22px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            letter-spacing: 0.04em;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+        .btn-reset {
+            background: transparent;
+            border: 1.5px solid rgba(255, 255, 255, 0.25);
+            color: #ccc;
+        }
+        .btn-reset:hover {
+            border-color: #fff;
+            color: #fff;
+            box-shadow: 0 0 18px rgba(255, 255, 255, 0.12);
+        }
+        .btn-submit {
+            background: var(--gold);
+            color: #0a0a1a;
+            box-shadow: var(--glow-gold);
+        }
+        .btn-submit:hover {
+            background: #ffe08a;
+            box-shadow: 0 0 35px rgba(244, 197, 66, 0.5);
+            transform: translateY(-2px);
+        }
+        .btn-compare {
+            background: linear-gradient(135deg, #c084fc, #a855f7);
+            color: #fff;
+            box-shadow: 0 0 25px rgba(168, 85, 247, 0.35);
+        }
+        .btn-compare:hover {
+            box-shadow: 0 0 40px rgba(168, 85, 247, 0.6);
+            transform: translateY(-2px);
+        }
+
+        /* === Results Section === */
+        .results-section {
+            margin-top: 30px;
+            background: var(--bg-card);
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            box-shadow: 0 8px 50px rgba(0, 0, 0, 0.4);
+            display: none;
+        }
+        .results-section.visible {
+            display: block;
+            animation: fadeSlideUp 0.5s ease-out;
+        }
+        @keyframes fadeSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .results-header {
+            text-align: center;
+            padding: 22px 20px 16px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.01);
+        }
+        .results-header h2 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            letter-spacing: 0.03em;
+            color: var(--gold-light);
+        }
+        .results-header .emoji-fire {
+            font-size: 2rem;
+            display: inline-block;
+            animation: heartbeat 1s ease-in-out infinite;
+        }
+        .results-table-wrap {
+            overflow-x: auto;
+            padding: 10px 14px 20px;
+        }
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.82rem;
+            min-width: 700px;
+        }
+        .results-table th {
+            background: rgba(255, 255, 255, 0.04);
+            padding: 12px 10px;
+            text-align: center;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            color: var(--text-dim);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            border-bottom: 2px solid var(--border);
+            position: sticky;
+            top: 0;
+        }
+        .results-table th.col-country {
+            text-align: left;
+            min-width: 140px;
+        }
+        .results-table td {
+            padding: 9px 10px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .results-table td.col-country {
+            text-align: left;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .results-table .diff-high {
+            color: #ff6b7a;
+            font-weight: 700;
+        }
+        .results-table .diff-low {
+            color: #4ade80;
+            font-weight: 600;
+        }
+        .results-table .diff-neutral {
+            color: #f4c542;
+        }
+        .results-table tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+        .results-summary {
+            display: flex;
+            gap: 20px;
+            padding: 16px 20px;
+            border-top: 1px solid var(--border);
+            flex-wrap: wrap;
+            justify-content: center;
+            font-size: 0.9rem;
+            color: var(--text-dim);
+        }
+        .results-summary span {
+            font-weight: 700;
+            color: #fff;
+        }
+        .summary-badge {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 30px;
+            padding: 8px 18px;
+            letter-spacing: 0.03em;
+        }
+
+        /* === Toast / Notification === */
+        .toast {
+            position: fixed;
+            top: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 999;
+            background: #1a1a3e;
+            border: 1px solid var(--gold);
+            color: var(--gold-light);
+            padding: 14px 28px;
+            border-radius: 50px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), var(--glow-gold);
+            animation: toastIn 0.4s ease-out, toastOut 0.4s 2.2s ease-in forwards;
+            pointer-events: none;
+        }
+        @keyframes toastIn {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+        @keyframes toastOut {
+            from {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-30px);
+            }
+        }
+
+        /* === Confetti placeholder === */
+        .confetti-piece {
+            position: fixed;
+            z-index: 1000;
+            pointer-events: none;
+            animation: confettiFall var(--fall-dur) linear forwards;
+            font-size: 1.4rem;
+        }
+        @keyframes confettiFall {
+            0% {
+                opacity: 1;
+                transform: translateY(-60px) rotate(0deg) scale(1);
+            }
+            80% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(105vh) rotate(var(--rot)) scale(0.3);
+            }
+        }
+
+        /* === Responsive === */
+        @media (max-width: 768px) {
+            .header-logo {
+                font-size: 2.4rem;
+            }
+            .header-sub {
+                font-size: 0.8rem;
+                letter-spacing: 0.1em;
+            }
+            .voter-panel {
+                max-height: 70vh;
+                border-radius: 16px;
+            }
+            .country-card {
+                padding: 10px 12px;
+                border-radius: 10px;
+            }
+            .card-country {
+                font-size: 0.82rem;
+            }
+            .card-artist-song {
+                font-size: 0.7rem;
+            }
+            .slider-label {
+                font-size: 0.65rem;
+            }
+            input[type="range"] {
+                height: 6px;
+            }
+            input[type="range"]::-webkit-slider-thumb {
+                width: 22px;
+                height: 22px;
+            }
+            .btn {
+                padding: 9px 15px;
+                font-size: 0.75rem;
+                letter-spacing: 0.02em;
+            }
+            .results-table {
+                font-size: 0.7rem;
+            }
+        }
+        @media (max-width: 480px) {
+            .container {
+                padding: 8px 6px 24px;
+            }
+            .voting-grid {
+                gap: 12px;
+            }
+            .voter-panel {
+                border-radius: 12px;
+                max-height: 60vh;
+            }
+            .voter-header h2 {
+                font-size: 1.1rem;
+            }
+            .country-list {
+                padding: 6px 6px 10px;
+                gap: 5px;
+            }
+            .country-card {
+                padding: 8px 10px;
+                border-radius: 8px;
+            }
+            .card-flag {
+                font-size: 1.2rem;
+            }
+            .card-country {
+                font-size: 0.74rem;
+            }
+            .card-artist-song {
+                font-size: 0.65rem;
+            }
+            .sliders-row {
+                gap: 6px;
+            }
+            .btn-row {
+                padding: 10px 8px;
+                gap: 6px;
+            }
+            .btn {
+                padding: 8px 12px;
+                font-size: 0.7rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Starfield Background -->
+    <div class="starfield" id="starfield"></div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer"></div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-year">2026</div>
+            <div class="header-logo">EUROVISION</div>
+            <div class="header-sub">
+                <span class="heart-pulse">❤️</span> Голосование двух жюри <span class="heart-pulse">❤️</span>
+            </div>
+            <p style="color:var(--text-dim);font-size:0.85rem;margin-top:6px;">
+                Оцените каждую страну по двум критериям: <strong>Песня</strong> и <strong>Выступление</strong> (0–10)
+            </p>
+        </header>
+
+        <!-- Voting Grid: Two Panels Side by Side -->
+        <div class="voting-grid" id="votingGrid">
+            <!-- Panels will be generated by JS -->
+        </div>
+
+        <!-- Compare Button -->
+        <div style="text-align:center;margin-top:24px;">
+            <button class="btn btn-compare" id="btnCompare" onclick="revealComparison()">
+                🔥 Сравнить результаты жюри
+            </button>
+        </div>
+
+        <!-- Results Section -->
+        <div class="results-section" id="resultsSection">
+            <div class="results-header">
+                <span class="emoji-fire">🏆</span>
+                <h2>Сравнение оценок</h2>
+                <p style="color:var(--text-dim);font-size:0.85rem;">Жюри 1 (розовый) vs Жюри 2 (голубой)</p>
+            </div>
+            <div class="results-table-wrap" id="resultsTableWrap">
+                <!-- Generated by JS -->
+            </div>
+            <div class="results-summary" id="resultsSummary">
+                <!-- Generated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // ==================== COUNTRIES DATA ====================
+            const countries = [
+                { country: 'Албания', artist: 'Alis', song: 'Nân', flag: '🇦🇱' },
+                { country: 'Армения', artist: 'SIMÓN', song: 'Paloma Rumba', flag: '🇦🇲' },
+                { country: 'Австралия', artist: 'Delta Goodrem', song: 'Eclipse', flag: '🇦🇺' },
+                { country: 'Австрия', artist: 'COSMÓ', song: 'Tanzschein', flag: '🇦🇹' },
+                { country: 'Азербайджан', artist: 'JIVA', song: 'Just Go', flag: '🇦🇿' },
+                { country: 'Бельгия', artist: 'ESSYLA', song: 'Dancing on the Ice', flag: '🇧🇪' },
+                { country: 'Болгария', artist: 'DARA', song: 'Bangaranga', flag: '🇧🇬' },
+                { country: 'Хорватия', artist: 'LELEK', song: 'Andromeda', flag: '🇭🇷' },
+                { country: 'Кипр', artist: 'Antigoni', song: 'Jalla', flag: '🇨🇾' },
+                { country: 'Чехия', artist: 'Daniel Zizka', song: 'Crossroads', flag: '🇨🇿' },
+                { country: 'Дания', artist: 'Søren Torpegaard Lund', song: 'Før Vi Går Hjem', flag: '🇩🇰' },
+                { country: 'Эстония', artist: 'Vanilla Ninja', song: 'Too Epic To Be True', flag: '🇪🇪' },
+                { country: 'Финляндия', artist: 'Linda Lampenius & Pete Parkkonen', song: 'Liekinheitin',
+                flag: '🇫🇮' },
+                { country: 'Франция', artist: 'Monroe', song: 'Regarde !', flag: '🇫🇷' },
+                { country: 'Грузия', artist: 'Bzikebi', song: 'On Replay', flag: '🇬🇪' },
+                { country: 'Германия', artist: 'Sarah Engels', song: 'Fire', flag: '🇩🇪' },
+                { country: 'Греция', artist: 'Akylas', song: 'Ferto', flag: '🇬🇷' },
+                { country: 'Израиль', artist: 'Noam Bettan', song: 'Michelle', flag: '🇮🇱' },
+                { country: 'Италия', artist: 'Sal Da Vinci', song: 'Per sempre sì', flag: '🇮🇹' },
+                { country: 'Латвия', artist: 'Atvara', song: 'Ēnā', flag: '🇱🇻' },
+                { country: 'Литва', artist: 'Lion Ceccah', song: 'Sólo quiero más', flag: '🇱🇹' },
+                { country: 'Люксембург', artist: 'Eva Marija', song: 'Mother Nature', flag: '🇱🇺' },
+                { country: 'Мальта', artist: 'AIDAN', song: 'Bella', flag: '🇲🇹' },
+                { country: 'Молдова', artist: 'Satoshi', song: 'Viva, Moldova!', flag: '🇲🇩' },
+                { country: 'Черногория', artist: 'Tamara Živković', song: 'Nova Zora', flag: '🇲🇪' },
+                { country: 'Норвегия', artist: 'JONAS LOVV', song: 'YA YA YA', flag: '🇳🇴' },
+                { country: 'Польша', artist: 'Alicja', song: 'Pray', flag: '🇵🇱' },
+                { country: 'Португалия', artist: 'Bandidos do Cante', song: 'Rosa', flag: '🇵🇹' },
+                { country: 'Румыния', artist: 'Alexandra Căpitănescu', song: 'Choke Me', flag: '🇷🇴' },
+                { country: 'Сан-Марино', artist: 'Senhit feat. Boy George', song: 'Superstar', flag: '🇸🇲' },
+                { country: 'Сербия', artist: 'Lavina', song: 'Kraj mene', flag: '🇷🇸' },
+                { country: 'Швеция', artist: 'Felicia', song: 'My System', flag: '🇸🇪' },
+                { country: 'Швейцария', artist: 'Veronica Fusaro', song: 'Alice', flag: '🇨🇭' },
+                { country: 'Украина', artist: 'Leléka', song: 'Ridnym', flag: '🇺🇦' },
+                { country: 'Великобритания', artist: 'Look Mum No Computer', song: 'Eins, Zwei, Drei', flag: '🇬🇧' },
+            ];
+
+            // ==================== STATE ====================
+            // scores[ voterIndex ][ countryIndex ] = { song: number, performance: number }
+            const scores = [
+                {}, // Voter 1
+                {}, // Voter 2
+            ];
+
+            // Initialize all scores to 0
+            countries.forEach((_, ci) => {
+                scores[0][ci] = { song: 0, performance: 0 };
+                scores[1][ci] = { song: 0, performance: 0 };
+            });
+
+            // ==================== STARFIELD ====================
+            function createStarfield() {
+                const container = document.getElementById('starfield');
+                const count = 120;
+                let html = '';
+                for (let i = 0; i < count; i++) {
+                    const x = Math.random() * 100;
+                    const y = Math.random() * 100;
+                    const size = Math.random() * 2.2 + 0.6;
+                    const dur = Math.random() * 4 + 3;
+                    const delay = Math.random() * 5;
+                    html +=
+                        `<div class="star" style="left:${x}%;top:${y}%;width:${size}px;height:${size}px;--dur:${dur}s;--delay:${delay}s;"></div>`;
+                }
+                container.innerHTML = html;
+            }
+            createStarfield();
+
+            // ==================== RENDER VOTER PANELS ====================
+            function renderVoterPanel(voterIndex) {
+                const voterName = voterIndex === 0 ? 'Жюри 1' : 'Жюри 2';
+                const voterIcon = voterIndex === 0 ? '💗' : '💙';
+                const voterClass = voterIndex === 0 ? 'voter1' : 'voter2';
+                const panelId = `voterPanel${voterIndex}`;
+
+                let cardsHTML = '';
+                countries.forEach((c, ci) => {
+                    const s = scores[voterIndex][ci];
+                    const total = s.song + s.performance;
+                    const badgeClass = total >= 14 ? 'active' : '';
+                    cardsHTML += `
+                    <div class="country-card" data-voter="${voterIndex}" data-country="${ci}" id="card-v${voterIndex}-c${ci}">
+                        <div class="card-top">
+                            <span class="card-flag">${c.flag}</span>
+                            <div class="card-info">
+                                <div class="card-country">${c.country}</div>
+                                <div class="card-artist-song">${c.artist} — ${c.song}</div>
+                            </div>
+                            <div class="card-score-badge ${badgeClass}" id="badge-v${voterIndex}-c${ci}">${total}/20</div>
+                        </div>
+                        <div class="sliders-row">
+                            <div class="slider-group">
+                                <div class="slider-label">
+                                    <span><span class="criteria-icon">🎵</span> Песня</span>
+                                    <span class="slider-value low" id="songVal-v${voterIndex}-c${ci}">0</span>
+                                </div>
+                                <input type="range" min="0" max="10" step="1" value="${s.song}"
+                                    data-voter="${voterIndex}" data-country="${ci}" data-criteria="song"
+                                    id="songSlider-v${voterIndex}-c${ci}">
+                            </div>
+                            <div class="slider-group">
+                                <div class="slider-label">
+                                    <span><span class="criteria-icon">🎤</span> Выступление</span>
+                                    <span class="slider-value low" id="perfVal-v${voterIndex}-c${ci}">0</span>
+                                </div>
+                                <input type="range" min="0" max="10" step="1" value="${s.performance}"
+                                    data-voter="${voterIndex}" data-country="${ci}" data-criteria="performance"
+                                    id="perfSlider-v${voterIndex}-c${ci}">
+                            </div>
+                        </div>
+                    </div>`;
+                });
+
+                const totalAll = getVoterTotal(voterIndex);
+                const maxPossible = countries.length * 20;
+
+                return `
+                <div class="voter-panel ${voterClass}" id="${panelId}">
+                    <div class="voter-header">
+                        <span class="voter-icon">${voterIcon}</span>
+                        <h2>${voterName}</h2>
+                        <div class="voter-total">
+                            Сумма баллов: <strong id="totalDisplay-v${voterIndex}">${totalAll}</strong> / ${maxPossible}
+                        </div>
+                    </div>
+                    <div class="country-list" id="countryList-v${voterIndex}">
+                        ${cardsHTML}
+                    </div>
+                    <div class="btn-row">
+                        <button class="btn btn-reset" onclick="resetVoter(${voterIndex})" title="Сбросить все оценки этого жюри">
+                            🔄 Сбросить
+                        </button>
+                        <button class="btn btn-submit" onclick="submitVoter(${voterIndex})" title="Подтвердить оценки жюри">
+                            ✅ Готово
+                        </button>
+                    </div>
+                </div>`;
+            }
+
+            function getVoterTotal(voterIndex) {
+                let total = 0;
+                countries.forEach((_, ci) => {
+                    const s = scores[voterIndex][ci];
+                    if (s) total += s.song + s.performance;
+                });
+                return total;
+            }
+
+            function renderAll() {
+                const grid = document.getElementById('votingGrid');
+                grid.innerHTML = renderVoterPanel(0) + renderVoterPanel(1);
+                attachSliderListeners();
+                // Restore visual states
+                countries.forEach((_, ci) => {
+                    updateCardVisual(0, ci);
+                    updateCardVisual(1, ci);
+                });
+                updateTotalDisplay(0);
+                updateTotalDisplay(1);
+            }
+
+            // ==================== UPDATE VISUALS ====================
+            function updateSliderValueDisplay(voterIndex, countryIndex, criteria) {
+                const prefix = criteria === 'song' ? 'songVal' : 'perfVal';
+                const el = document.getElementById(`${prefix}-v${voterIndex}-c${countryIndex}`);
+                if (!el) return;
+                const val = scores[voterIndex][countryIndex][criteria];
+                el.textContent = val;
+                el.className = 'slider-value';
+                if (val >= 8) el.classList.add('high');
+                else if (val >= 4) el.classList.add('mid');
+                else el.classList.add('low');
+            }
+
+            function updateCardVisual(voterIndex, countryIndex) {
+                const s = scores[voterIndex][countryIndex];
+                const total = s.song + s.performance;
+                const badge = document.getElementById(`badge-v${voterIndex}-c${countryIndex}`);
+                const card = document.getElementById(`card-v${voterIndex}-c${countryIndex}`);
+                if (badge) {
+                    badge.textContent = total + '/20';
+                    badge.className = 'card-score-badge';
+                    if (total >= 14) badge.classList.add('active');
+                }
+                if (card) {
+                    card.classList.toggle('highlighted', total >= 16);
+                }
+                updateSliderValueDisplay(voterIndex, countryIndex, 'song');
+                updateSliderValueDisplay(voterIndex, countryIndex, 'performance');
+            }
+
+            function updateTotalDisplay(voterIndex) {
+                const el = document.getElementById(`totalDisplay-v${voterIndex}`);
+                if (el) el.textContent = getVoterTotal(voterIndex);
+            }
+
+            function updateAllVisuals(voterIndex, countryIndex) {
+                updateCardVisual(voterIndex, countryIndex);
+                updateTotalDisplay(voterIndex);
+            }
+
+            // ==================== SLIDER HANDLERS ====================
+            function attachSliderListeners() {
+                document.querySelectorAll('input[type="range"]').forEach(slider => {
+                    // Remove old listeners by cloning (simple approach)
+                    const clone = slider.cloneNode(true);
+                    slider.parentNode.replaceChild(clone, slider);
+                    clone.addEventListener('input', handleSliderInput);
+                });
+            }
+
+            function handleSliderInput(e) {
+                const slider = e.target;
+                const voterIndex = parseInt(slider.dataset.voter);
+                const countryIndex = parseInt(slider.dataset.country);
+                const criteria = slider.dataset.criteria;
+                const value = parseInt(slider.value);
+
+                scores[voterIndex][countryIndex][criteria] = value;
+                updateAllVisuals(voterIndex, countryIndex);
+
+                // Update the other voter's same slider if visible (sync the display value element)
+                updateSliderValueDisplay(voterIndex, countryIndex, criteria);
+            }
+
+            // ==================== BUTTON ACTIONS ====================
+            window.resetVoter = function(voterIndex) {
+                countries.forEach((_, ci) => {
+                    scores[voterIndex][ci] = { song: 0, performance: 0 };
+                    // Reset sliders
+                    const songSlider = document.getElementById(`songSlider-v${voterIndex}-c${ci}`);
+                    const perfSlider = document.getElementById(`perfSlider-v${voterIndex}-c${ci}`);
+                    if (songSlider) songSlider.value = 0;
+                    if (perfSlider) perfSlider.value = 0;
+                    updateAllVisuals(voterIndex, ci);
+                });
+                updateTotalDisplay(voterIndex);
+                showToast(voterIndex === 0 ? '💗 Жюри 1: все оценки сброшены' : '💙 Жюри 2: все оценки сброшены');
+            };
+
+            window.submitVoter = function(voterIndex) {
+                const total = getVoterTotal(voterIndex);
+                const name = voterIndex === 0 ? 'Жюри 1' : 'Жюри 2';
+                const icon = voterIndex === 0 ? '💗' : '💙';
+                if (total === 0) {
+                    showToast(`⚠️ ${icon} ${name}: выставьте хотя бы одну оценку!`);
+                    return;
+                }
+                // Find top country
+                let topCi = 0;
+                let topScore = 0;
+                countries.forEach((_, ci) => {
+                    const s = scores[voterIndex][ci];
+                    const t = s.song + s.performance;
+                    if (t > topScore) { topScore = t;
+                        topCi = ci; }
+                });
+                const topCountry = countries[topCi];
+                showToast(
+                    `${icon} ${name}: оценки приняты! Фаворит — ${topCountry.flag} ${topCountry.country} (${topScore}/20)`);
+                // Scroll to top of that voter's panel
+                const list = document.getElementById(`countryList-v${voterIndex}`);
+                if (list) list.scrollTo({ top: 0, behavior: 'smooth' });
+                // Highlight the top card briefly
+                const topCard = document.getElementById(`card-v${voterIndex}-c${topCi}`);
+                if (topCard) {
+                    topCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    topCard.style.boxShadow = '0 0 30px rgba(244,197,66,0.6)';
+                    topCard.style.borderColor = 'var(--gold)';
+                    setTimeout(() => {
+                        topCard.style.boxShadow = '';
+                        topCard.style.borderColor = '';
+                        updateCardVisual(voterIndex, topCi);
+                    }, 2000);
+                }
+            };
+
+            // ==================== COMPARISON ====================
+            window.revealComparison = function() {
+                const section = document.getElementById('resultsSection');
+                const total1 = getVoterTotal(0);
+                const total2 = getVoterTotal(1);
+
+                if (total1 === 0 && total2 === 0) {
+                    showToast('⚠️ Сначала выставьте оценки в панелях жюри!');
+                    return;
+                }
+
+                // Build comparison table
+                let tableHTML = `
+                <table class="results-table">
+                    <thead>
+                        <tr>
+                            <th class="col-country">Страна</th>
+                            <th>🎵 Песня (Ж1)</th>
+                            <th>🎤 Выст. (Ж1)</th>
+                            <th>Сумма Ж1</th>
+                            <th>🎵 Песня (Ж2)</th>
+                            <th>🎤 Выст. (Ж2)</th>
+                            <th>Сумма Ж2</th>
+                            <th>Разница</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+
+                let totalDiff = 0;
+                let agreements = 0;
+                let maxDiff = 0;
+                let maxDiffCountry = '';
+
+                countries.forEach((c, ci) => {
+                    const s1 = scores[0][ci];
+                    const s2 = scores[1][ci];
+                    const sum1 = s1.song + s1.performance;
+                    const sum2 = s2.song + s2.performance;
+                    const diff = Math.abs(sum1 - sum2);
+                    totalDiff += diff;
+                    if (diff <= 2) agreements++;
+                    if (diff > maxDiff) { maxDiff = diff;
+                        maxDiffCountry = c.country; }
+
+                    let diffClass = 'diff-neutral';
+                    if (diff >= 8) diffClass = 'diff-high';
+                    else if (diff <= 2) diffClass = 'diff-low';
+
+                    const diffSign = sum1 > sum2 ? '←' : sum1 < sum2 ? '→' : '';
+
+                    tableHTML += `
+                        <tr>
+                            <td class="col-country">${c.flag} ${c.country}</td>
+                            <td>${s1.song}</td>
+                            <td>${s1.performance}</td>
+                            <td><strong>${sum1}</strong></td>
+                            <td>${s2.song}</td>
+                            <td>${s2.performance}</td>
+                            <td><strong>${sum2}</strong></td>
+                            <td class="${diffClass}">${diffSign} ${diff}</td>
+                        </tr>`;
+                });
+
+                tableHTML += '</tbody></table>';
+
+                document.getElementById('resultsTableWrap').innerHTML = tableHTML;
+
+                const agreePercent = Math.round((agreements / countries.length) * 100);
+                document.getElementById('resultsSummary').innerHTML = `
+                    <span class="summary-badge">💗 Жюри 1: <span>${total1}</span> баллов</span>
+                    <span class="summary-badge">💙 Жюри 2: <span>${total2}</span> баллов</span>
+                    <span class="summary-badge">🤝 Совпадений (разница ≤2): <span>${agreements} из ${countries.length}</span> (${agreePercent}%)</span>
+                    <span class="summary-badge">💥 Макс. разногласие: <span>${maxDiffCountry}</span> (${maxDiff} баллов)</span>
+                `;
+
+                section.classList.add('visible');
+                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+                // Spawn confetti
+                spawnConfetti();
+
+                showToast('🏆 Результаты сравнения готовы!');
+            };
+
+            // ==================== CONFETTI ====================
+            function spawnConfetti() {
+                const emojis = ['🎉', '✨', '🌟', '💫', '🏆', '🎵', '🎤', '💗', '💙', '⭐', '🔥', '💎', '🎶', '🥇', '🌈'];
+                const count = 60;
+                for (let i = 0; i < count; i++) {
+                    const piece = document.createElement('span');
+                    piece.className = 'confetti-piece';
+                    piece.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                    piece.style.left = Math.random() * 100 + '%';
+                    piece.style.top = -(Math.random() * 40 + 10) + 'px';
+                    piece.style.setProperty('--fall-dur', (Math.random() * 2.5 + 2) + 's');
+                    piece.style.setProperty('--rot', (Math.random() * 720 - 360) + 'deg');
+                    piece.style.animationDelay = Math.random() * 0.6 + 's';
+                    document.body.appendChild(piece);
+                    setTimeout(() => piece.remove(), 3500);
+                }
+            }
+
+            // ==================== TOAST ====================
+            function showToast(message) {
+                const container = document.getElementById('toastContainer');
+                const toast = document.createElement('div');
+                toast.className = 'toast';
+                toast.textContent = message;
+                container.appendChild(toast);
+                setTimeout(() => toast.remove(), 2700);
+            }
+
+            // ==================== INIT ====================
+            function init() {
+                renderAll();
+                // Add global listener for slider changes (delegated)
+                document.getElementById('votingGrid').addEventListener('input', function(e) {
+                    if (e.target.tagName === 'INPUT' && e.target.type === 'range') {
+                        handleSliderInput(e);
+                    }
+                });
+            }
+
+            // ==================== EXPOSE FOR INLINE HANDLERS ====================
+            window.revealComparison = window.revealComparison;
+            window.resetVoter = window.resetVoter;
+            window.submitVoter = window.submitVoter;
+
+            // Start
+            init();
+
+            console.log('🎵 Eurovision 2026 — Голосование двух жюри готово!');
+            console.log('   Оцените 35 стран по критериям Песня (0-10) и Выступление (0-10)');
+            console.log('   Два жюри голосуют независимо. Нажмите "Сравнить результаты" для анализа.');
+            console.log('   💗 Жюри 1 (розовый) | 💙 Жюри 2 (голубой)');
+        })();
+    </script>
+</body>
+</html>
